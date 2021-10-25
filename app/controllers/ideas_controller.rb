@@ -1,5 +1,6 @@
 class IdeasController < ApplicationController
     before_action :find_idea, only: [:show, :destroy, :edit, :update]
+    before_action :authenticate_user!, except: [:index, :show]
 
     def new
         @idea = Idea.new
@@ -7,6 +8,7 @@ class IdeasController < ApplicationController
 
     def create
         @idea = Idea.new(idea_params)
+        @idea.user = current_user
         if @idea.save
             redirect_to idea_path(@idea)
         else

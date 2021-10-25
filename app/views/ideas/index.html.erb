@@ -1,0 +1,15 @@
+<div class="d-flex mb-5 flex-wrap"> 
+<% @ideas.each do |idea| %>
+        <div class="col-md-12 col-sm-12 col-12 border-top border-dark border-3">
+            <div class="mx-3">
+                <h2><%= idea.title %></h2>
+                <div class="d-flex justify-content-between">
+                    <h5><%= idea.description%></h5>
+                </div>
+                <div class="d-flex">
+                    <div> <%= link_to("By #{idea.user.name}", idea_path(idea)) %> </div>
+                </div>
+            </div>
+        </div>  
+<% end %>
+</div>

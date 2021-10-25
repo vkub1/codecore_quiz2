@@ -13,17 +13,16 @@ Idea.destroy_all
 PASSWORD = '123'
 
 5.times do 
-    name = Faker::Name.name
     User.create(
-        name: name,
-        email: "#{name}@gmail.com",
+        name: Faker::Name.name,
+        email: Faker::Internet.email,
         password: PASSWORD
     )
 end
 
 users = User.all
 
-5.times do
+10.times do
     created_at = Faker::Date.backward(days:365 * 2)
     Idea.create(
         title: Faker::Company.catch_phrase,

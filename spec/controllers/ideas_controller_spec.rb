@@ -91,78 +91,138 @@ RSpec.describe IdeasController, type: :controller do
         end
         
         describe "#destroy" do
-            before do
-                @idea = FactoryBot.create(:idea)
-                delete(:destroy, params:{ id:@idea.id})
-            end
-    
-            it "should remove a job post from the database" do
-                expect(Idea.find_by(id: @idea.id)).to(be(nil)) 
-            end
-    
-            it "should redirect to the ideas index" do
-                expect(response).to(redirect_to(ideas_path)) 
-            end
-    
-            it "should set a flash message" do
-                expect(flash[:alert]).to be
+            context "as owner" do
+                before do
+                    current_user = FactoryBot.create(:user)
+                    session[:user_id] = current_user.id
+                    @idea = FactoryBot.create(:idea, user: current_user)
+                    delete(:destroy, params:{ id:@idea.id})
+                end
+        
+                it "should remove a job post from the database" do
+                    expect(Idea.find_by(id: @idea.id)).to(be(nil)) 
+                end
+        
+                it "should redirect to the ideas index" do
+                    expect(response).to(redirect_to(ideas_path)) 
+                end
+        
+                it "should set a flash message" do
+                    expect(flash[:alert]).to be
+                end
             end
             
+            context "as non owner" do
+                before do
+                    session[:user_id] = FactoryBot.create(:user).id
+                    @idea = FactoryBot.create(:idea)
+                    delete(:destroy, params:{id:@idea.id})
+                end
+                
+                it "idea should not be removed from db" do
+                    expect(Idea.find(@idea.id)).to(eq(@idea)) 
+                end
+
+                it "should redirect to the show page" do
+                    expect(response).to(redirect_to(idea_path(@idea))) 
+                end
+            end
         end
     
         describe "#edit" do
-            before do
-                @idea = FactoryBot.create(:idea)
-                get(:edit, params:{id: @idea.id})
+            context "as owner" do
+                before do
+                    current_user = FactoryBot.create(:user)
+                    session[:user_id] = current_user.id
+                    @idea = FactoryBot.create(:idea, user: current_user)
+                    get(:edit, params:{id: @idea.id})
+                end
+        
+                it "should render the edit template" do
+                    expect(response).to(render_template(:edit)) 
+                end
+        
+                it "should set the instance variable @idea for the edit template" do
+                    expect(assigns(:idea)).to(eq(@idea)) 
+                end
             end
-    
-            it "should render the edit template" do
-                expect(response).to(render_template(:edit)) 
+
+            context "as non owner" do
+                it "should redirect to show page" do
+                    session[:user_id] = FactoryBot.create(:user).id
+                    idea = FactoryBot.create(:idea)
+                    get(:edit, params:{id: idea.id})
+                    expect(response).to(redirect_to(idea_path(idea.id))) 
+                end
             end
-    
-            it "should set the instance variable @idea for the edit template" do
-                expect(assigns(:idea)).to(eq(@idea)) 
-            end
+            
+            
+            
         end
     
         describe "#update" do
-            before do
-                @idea = FactoryBot.create(:idea)
-            end
-            context "with valid params" do
+            context "as owner" do
                 before do
+                    current_user = FactoryBot.create(:user)
+                    session[:user_id] = current_user.id
+                    @idea = FactoryBot.create(:idea, user: current_user)
+                end
+                context "with valid params" do
+                    before do
+                        @new_title = "#{@idea.title} plus something"
+                        patch(:update, params:{id: @idea.id, idea:{title:@new_title} })
+                    end
+        
+                    it "should update the idea in the database" do
+                        expect(@idea.reload.title).to(eq(@new_title))
+                    end
+        
+                    it "should redirect to the show page" do
+                        expect(response).to(redirect_to idea_path(@idea))  
+                    end
+                    
+                end
+                
+                context "with invalid params" do
+                    before do
+                        patch(:update, params:{id: @idea.id, idea:{title:nil} })
+                    end
+        
+                    it "should not update the idea record" do   
+                        expect(@idea.reload.title).to(eq(@idea.title)) 
+                    end
+        
+                    it "should render the edit template" do
+                        expect(response).to(render_template(:edit))  
+                    end
+        
+                    it "should set instance variable @idea for edit template" do
+                        expect(assigns(:idea)).to(eq(@idea))  
+                    end
+                    
+                end
+            end
+            
+            context "as non owner" do
+                before do
+                    session[:user_id] = FactoryBot.create(:user).id
+                    @idea = FactoryBot.create(:idea)
                     @new_title = "#{@idea.title} plus something"
                     patch(:update, params:{id: @idea.id, idea:{title:@new_title} })
                 end
-    
-                it "should update the idea in the database" do
-                    expect(@idea.reload.title).to(eq(@new_title))
+
+                it "idea should not be updated in the db" do
+                    expect(Idea.find(@idea.id)).to(eq(@idea)) 
                 end
-    
+
                 it "should redirect to the show page" do
-                    expect(response).to(redirect_to idea_path(@idea))  
+                    expect(response).to(redirect_to(idea_path(@idea))) 
                 end
+
+
                 
             end
             
-            context "with invalid params" do
-                before do
-                    patch(:update, params:{id: @idea.id, idea:{title:nil} })
-                end
-    
-                it "should not update the idea record" do   
-                    expect(@idea.reload.title).to(eq(@idea.title)) 
-                end
-    
-                it "should render the edit template" do
-                    expect(response).to(render_template(:edit))  
-                end
-    
-                it "should set instance variable @idea for edit template" do
-                    expect(assigns(:idea)).to(eq(@idea))  
-                end
-                
-            end
             
         end
     end

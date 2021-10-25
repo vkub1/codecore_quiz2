@@ -118,8 +118,49 @@ RSpec.describe IdeasController, type: :controller do
         it "should set the instance variable @idea for the edit template" do
             expect(assigns(:idea)).to(eq(@idea)) 
         end
+    end
+
+    describe "#update" do
+        before do
+            @idea = FactoryBot.create(:idea)
+        end
+        context "with valid params" do
+            before do
+                @new_title = "#{@idea.title} plus something"
+                patch(:update, params:{id: @idea.id, idea:{title:@new_title} })
+            end
+
+            it "should update the idea in the database" do
+                expect(@idea.reload.title).to(eq(@new_title))
+            end
+
+            it "should redirect to the show page" do
+                expect(response).to(redirect_to idea_path(@idea))  
+            end
+            
+        end
+        
+        context "with invalid params" do
+            before do
+                patch(:update, params:{id: @idea.id, idea:{title:nil} })
+            end
+
+            it "should not update the idea record" do   
+                expect(@idea.reload.title).to(eq(@idea.title)) 
+            end
+
+            it "should render the edit template" do
+                expect(response).to(render_template(:edit))  
+            end
+
+            it "should set instance variable @idea for edit template" do
+                expect(assigns(:idea)).to(eq(@idea))  
+            end
+            
+        end
         
     end
+    
     
     
 end

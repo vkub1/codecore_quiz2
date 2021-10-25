@@ -1,5 +1,5 @@
 class IdeasController < ApplicationController
-    before_action :find_idea, only: [:show, :destroy, :edit]
+    before_action :find_idea, only: [:show, :destroy, :edit, :update]
 
     def new
         @idea = Idea.new
@@ -30,6 +30,14 @@ class IdeasController < ApplicationController
 
     def edit
         
+    end
+
+    def update
+        if @idea.update(idea_params)
+            redirect_to idea_path(@idea)
+        else
+            render :edit
+        end
     end
 
     private 

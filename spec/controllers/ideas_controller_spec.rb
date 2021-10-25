@@ -66,7 +66,24 @@ RSpec.describe IdeasController, type: :controller do
         it "should set an instance variable @idea for the show template" do
             expect(assigns(:idea)).to(eq(@idea))  
         end
-        
     end
+
+    describe "#index" do
+        it "should render the index template" do
+            get(:index)
+            expect(response).to(render_template(:index))  
+        end
+        
+        it "should assign an instance variable @ideas which contains all the created job posts" do
+            idea_1 = FactoryBot.create(:idea)
+            idea_2 = FactoryBot.create(:idea)
+            idea_3 = FactoryBot.create(:idea)
+
+            get(:index)
+
+            expect(assigns(:ideas)).to(eq([idea_3,idea_2,idea_1]))  
+        end
+    end
+    
     
 end

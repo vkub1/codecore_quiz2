@@ -18,6 +18,10 @@ class IdeasController < ApplicationController
 
     end
 
+    def index
+        @ideas = Idea.all.order(created_at: :desc)
+    end
+
     private 
 
     def find_idea
@@ -27,6 +31,5 @@ class IdeasController < ApplicationController
     def idea_params
         params.require(:idea).permit(:title, :description)
     end
-
 
 end

@@ -1,5 +1,5 @@
 class IdeasController < ApplicationController
-    before_action :find_idea, only: [:show]
+    before_action :find_idea, only: [:show, :destroy]
 
     def new
         @idea = Idea.new
@@ -20,6 +20,12 @@ class IdeasController < ApplicationController
 
     def index
         @ideas = Idea.all.order(created_at: :desc)
+    end
+
+    def destroy
+        @idea.destroy
+        flash[:alert] = "Idea deleted!"
+        redirect_to ideas_path
     end
 
     private 

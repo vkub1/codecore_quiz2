@@ -85,5 +85,24 @@ RSpec.describe IdeasController, type: :controller do
         end
     end
     
+    describe "#destroy" do
+        before do
+            @idea = FactoryBot.create(:idea)
+            delete(:destroy, params:{ id:@idea.id})
+        end
+
+        it "should remove a job post from the database" do
+            expect(Idea.find_by(id: @idea.id)).to(be(nil)) 
+        end
+
+        it "should redirect to the ideas index" do
+            expect(response).to(redirect_to(ideas_path)) 
+        end
+
+        it "should set a flash message" do
+            expect(flash[:alert]).to be
+        end
+        
+    end
     
 end

@@ -1,3 +1,3 @@
 Rails.application.routes.draw do
-  resources :ideas, only: [:new]
+  resources :ideas, only: [:new, :create, :show]
 end

@@ -50,12 +50,23 @@ RSpec.describe IdeasController, type: :controller do
                 invalid_param_request
                 expect(response).to(render_template(:new))  
             end
-            
+        end
+    end
 
+    describe "#show" do
+        before do
+            @idea = FactoryBot.create(:idea)
+            get(:show, params:{id: @idea.id})
+        end
+
+        it "should render the show template" do
+            expect(response).to(render_template(:show))  
+        end
+
+        it "should set an instance variable @idea for the show template" do
+            expect(assigns(:idea)).to(eq(@idea))  
         end
         
-        
     end
-    
     
 end

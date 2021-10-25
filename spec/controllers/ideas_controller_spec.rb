@@ -104,5 +104,22 @@ RSpec.describe IdeasController, type: :controller do
         end
         
     end
+
+    describe "#edit" do
+        before do
+            @idea = FactoryBot.create(:idea)
+            get(:edit, params:{id: @idea.id})
+        end
+
+        it "should render the edit template" do
+            expect(response).to(render_template(:edit)) 
+        end
+
+        it "should set the instance variable @idea for the edit template" do
+            expect(assigns(:idea)).to(eq(@idea)) 
+        end
+        
+    end
+    
     
 end

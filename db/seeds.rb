@@ -7,6 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 
 User.destroy_all
+Review.destroy_all
 Idea.destroy_all
 
 
@@ -24,11 +25,17 @@ users = User.all
 
 10.times do
     created_at = Faker::Date.backward(days:365 * 2)
-    Idea.create(
+    i = Idea.create(
         title: Faker::Company.catch_phrase,
         description: Faker::Lorem.paragraph(sentence_count: 8),
         created_at: created_at,
         user: users.sample
     )
+    if i.valid?
+        rand(1..5).times do
+            Review.create(body:Faker::Hacker.say_something_smart, idea:i, user: users.sample)
+        end
+    end
+    i.likers = users.shuffle.slice(0, rand(users.count))
 end
 
